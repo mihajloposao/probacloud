@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProductList from "./pages/ProductList";
+import SellerProductList from "./pages/SellerProductList";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import RegisterCustomer from "./pages/RegisterCustomer";
@@ -15,14 +16,15 @@ function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/productlist" 
-          element={<ProtectedRoute allowedRoles={['seller']}><ProductList /></ProtectedRoute>} />
+          <Route path="/seller/productlist" 
+          element={<ProtectedRoute allowedRoles={['seller']}><SellerProductList /></ProtectedRoute>} />
           <Route path="/addproduct" 
           element={<ProtectedRoute allowedRoles={['seller']}><AddProduct /></ProtectedRoute>}/>
           <Route path="/edit/:id" element={<ProtectedRoute allowedRoles={['seller']}><EditProduct /></ProtectedRoute>} />
           <Route path="/register/customer" element={<RegisterCustomer />} />
           <Route path="/register/seller" element={<RegisterSeller />} />
-          <Route path="/login" element={<Login />} />       
+          <Route path="/login" element={<Login />} />
+          <Route path="/productlist" element={<ProductList/>}/>       
         </Routes>
       </Layout>
     </Router>

@@ -62,13 +62,38 @@ app.get('/products', (req, res) => {
   });
 });
 
-// Dodavanje proizvoda
+// Dohvatanje proizvoda za trenutno ulogovanog sellera
+app.get('/seller/products', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY); // isto kao u login ruti
+  } catch (err) {
+    return res.status(401).json({ error: 'Nevažeći token' });
+  }
+  const query = 'SELECT * FROM products WHERE user_id = ?';
+  db.query(query, [decoded.id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Greška servera' });
+    res.json(results);
+  });
+});
+
+// Dodavanje proizvoda sa user_id
 app.post('/products', upload.single('image'), (req, res) => {
-  const { name, description, price } = req.body;
+  const { name, description, price, user_id } = req.body; // dodali user_id
   const imagePath = req.file ? `uploads/${req.file.filename}` : null;
 
-  const query = 'INSERT INTO products (name, description, price, image_path) VALUES (?, ?, ?, ?)';
-  db.query(query, [name, description, price, imagePath], (err, result) => {
+  if (!user_id) {
+    return res.status(400).json({ error: "Nije prosleđen user_id" });
+  }
+
+  const query = 'INSERT INTO products (name, description, price, image_path, user_id) VALUES (?, ?, ?, ?, ?)';
+  db.query(query, [name, description, price, imagePath, user_id], (err, result) => {
     if (err) return res.status(500).json({ error: 'Greška servera' });
     res.json({ message: 'Proizvod uspešno dodat!', productId: result.insertId });
   });

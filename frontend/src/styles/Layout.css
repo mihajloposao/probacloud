@@ -1,5 +1,5 @@
 .layout {
-  background: linear-gradient(to right, #b3f0ff,#6666ff);
+  background: linear-gradient(to right, #99bbff,#944dff,#ff0000);
   min-height: 100vh;
 
 }
@@ -16,9 +16,14 @@
 }
 
 .nav-link {
-  text-decoration: none;
+  background: none;
+  border: none;
   color: #007bff;
+  text-decoration: none;
+  font: inherit;
   font-weight: bold;
+  cursor: pointer;
+  padding: 0;
 }
 
 .nav-link:hover {
@@ -33,6 +38,12 @@
 
 .nav-title:hover{
     color: #007bff;
+}
+
+.additional{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
 }
 
 .content {

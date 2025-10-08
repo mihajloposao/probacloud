@@ -26,12 +26,13 @@ function Layout({ children }) {
     <div className="layout">
       <nav className="nav">
         <Link to="/" className="nav-title">MSHOP</Link>
+        <div className="additional">
         {userRole === "seller" && (
           <Link to="/addproduct" className="nav-link">Dodaj proizvod</Link>
         )}
         {token && (
           <button onClick={handleLogout} className="nav-link">Logout</button>
-        )}
+        )}</div>
       </nav>
       <div className="content">
         {children}
