@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(100) UNIQUE,
   password VARCHAR(100),
   balance DECIMAL(10,2) DEFAULT 0.00,
-  role ENUM('admin', 'customer') DEFAULT 'customer'
+  role ENUM('seller', 'customer') DEFAULT 'customer'
 );
 
 -- Tabela proizvoda

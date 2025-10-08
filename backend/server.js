@@ -5,6 +5,7 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const multer = require('multer');
 const path = require('path');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -112,6 +113,85 @@ app.get('/products/:id', (req, res) => {
     res.json(results[0]);
   });
 });
+
+// Registracija korisnika (customer ili seller)
+app.post('/users/register', async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  // Provera da li su obavezna polja popunjena
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Sva polja su obavezna!' });
+  }
+
+  try {
+    // Proveravamo da li korisnik sa istim emailom već postoji
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Greška servera' });
+
+      if (results.length > 0) {
+        return res.status(400).json({ error: 'Korisnik već postoji' });
+      }
+
+      // Šifrujemo lozinku
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // role može biti 'seller' ili 'customer' (ako nije poslato, default je 'customer')
+      const userRole = role === 'seller' ? 'seller' : 'customer';
+
+      // Ubacujemo korisnika u bazu
+      db.query(
+        'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+        [name, email, hashedPassword, userRole],
+        (err, result) => {
+          if (err) return res.status(500).json({ error: 'Greška servera' });
+
+          res.json({ message: 'Registracija uspešna!' });
+        }
+      );
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Greška servera' });
+  }
+});
+
+// Prijava korisnika
+app.post('/users/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Unesite email i lozinku' });
+  }
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ error: 'Greška servera' });
+
+    if (results.length === 0) {
+      return res.status(400).json({ error: 'Neispravan email ili lozinka' });
+    }
+
+    const user = results[0];
+
+    // Proveravamo lozinku
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Neispravan email ili lozinka' });
+    }
+
+    // Vraćamo podatke o korisniku (bez lozinke)
+    res.json({
+      message: 'Uspešno prijavljen!',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  });
+});
+
 
 // Start servera
 app.listen(PORT, () => {
