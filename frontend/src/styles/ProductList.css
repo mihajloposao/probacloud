@@ -85,3 +85,17 @@ button.delete {
 button.delete:hover {
   background-color: #c82333;
 }
+
+.buy {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.buy:hover {
+  background-color: #45a049;
+}

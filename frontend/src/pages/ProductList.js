@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/ProductList.css";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
-  const navigate = useNavigate();
 
   const fetchProducts = () => {
     fetch(`${process.env.REACT_APP_API_URL}/products`)
@@ -16,20 +14,6 @@ function ProductList() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  const handleDelete = (id) => {
-    if (!window.confirm("Da li ste sigurni da želite da obrišete proizvod?")) return;
-
-    fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => fetchProducts())
-      .catch((err) => console.error(err));
-  };
-
-  const handleEdit = (id) => {
-    navigate(`/edit/${id}`);
-  };
 
   return (
     <div>
@@ -51,8 +35,7 @@ function ProductList() {
               <p>{p.price} RSD</p>
             </div>
             <div className="product-actions">
-              <button className="edit" onClick={() => handleEdit(p.id)}>Izmeni</button>
-              <button className="delete" onClick={() => handleDelete(p.id)}>Obriši</button>
+              <button className="buy">Kupi</button>
             </div>
           </li>
         ))}

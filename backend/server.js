@@ -7,6 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { DECIMAL } = require('sequelize');
 const SECRET_KEY = "ovo_je_moj_tajni_kljuc"; // kasnije može iz .env
 require('dotenv').config();
 
@@ -208,7 +209,7 @@ app.post('/users/login', (req, res) => {
 
     // nakon što proverimo lozinku
 const token = jwt.sign(
-  { id: user.id, role: user.role, name: user.name },
+  { id: user.id, role: user.role, name: user.name},
   SECRET_KEY,
   { expiresIn: '1h' } // token važi 1 sat
 );
@@ -225,7 +226,61 @@ res.json({
   });
   });
 });
+app.post('/addbalance', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Niste autorizovani' });
 
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (err) {
+    return res.status(401).json({ error: 'Nevažeći token' });
+  }
+
+  const { amount } = req.body;
+  if (!amount || isNaN(amount)) {
+    return res.status(400).json({ error: 'Nevažeći iznos' });
+  }
+
+  const query = 'UPDATE users SET balance = balance + ? WHERE id = ?';
+  db.query(query, [parseFloat(amount), decoded.id], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Greška servera' });
+    res.json({ message: 'Balance uspešno ažuriran.' });
+  });
+});
+
+// Ruta za dohvatanje trenutnog balansa ulogovanog korisnika
+app.get('/user/balance', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (err) {
+    return res.status(401).json({ error: 'Nevažeći token' });
+  }
+
+  const query = 'SELECT balance FROM users WHERE id = ?';
+  db.query(query, [decoded.id], (err, result) => {
+    if (err) {
+      console.error('Greška prilikom dohvatanja balansa:', err);
+      return res.status(500).json({ error: 'Greška servera' });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: 'Korisnik nije pronađen' });
+    }
+
+    res.json({ balance: result[0].balance });
+  });
+});
 
 // Start servera
 app.listen(PORT, () => {

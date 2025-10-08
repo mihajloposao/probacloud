@@ -46,6 +46,12 @@
   gap: 20px;
 }
 
+.nav-balance {
+  margin-right: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
 .content {
   margin: 20px;
   margin-top: 40px;
