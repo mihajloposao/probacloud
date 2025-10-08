@@ -7,6 +7,7 @@ import RegisterCustomer from "./pages/RegisterCustomer";
 import RegisterSeller from "./pages/RegisterSeller"; 
 import Login from "./pages/Login";         
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import './styles/App.css';
 
 function App() {
@@ -14,9 +15,11 @@ function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/" element={<ProductList />} />
-          <Route path="/add" element={<AddProduct />} />
-          <Route path="/edit/:id" element={<EditProduct />} />
+          <Route path="/productlist" 
+          element={<ProtectedRoute allowedRoles={['seller']}><ProductList /></ProtectedRoute>} />
+          <Route path="/addproduct" 
+          element={<ProtectedRoute allowedRoles={['seller']}><AddProduct /></ProtectedRoute>}/>
+          <Route path="/edit/:id" element={<ProtectedRoute allowedRoles={['seller']}><EditProduct /></ProtectedRoute>} />
           <Route path="/register/customer" element={<RegisterCustomer />} />
           <Route path="/register/seller" element={<RegisterSeller />} />
           <Route path="/login" element={<Login />} />       

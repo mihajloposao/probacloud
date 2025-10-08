@@ -6,6 +6,8 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = "ovo_je_moj_tajni_kljuc"; // kasnije može iz .env
 require('dotenv').config();
 
 const app = express();
@@ -179,16 +181,23 @@ app.post('/users/login', (req, res) => {
       return res.status(400).json({ error: 'Neispravan email ili lozinka' });
     }
 
-    // Vraćamo podatke o korisniku (bez lozinke)
-    res.json({
-      message: 'Uspešno prijavljen!',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    // nakon što proverimo lozinku
+const token = jwt.sign(
+  { id: user.id, role: user.role, name: user.name },
+  SECRET_KEY,
+  { expiresIn: '1h' } // token važi 1 sat
+);
+
+res.json({
+  message: 'Uspešno prijavljen!',
+  token, // dodajemo token
+  user: {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  },
+  });
   });
 });
 

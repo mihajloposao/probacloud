@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -17,10 +19,19 @@ function Login() {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage(`Prijavljen: ${data.user.name} (${data.user.role})`);
-        // Kasnije ovde ćemo čuvati JWT token
-      } else {
-        setMessage(data.error);
+  setMessage(`Prijavljen: ${data.user.name} (${data.user.role})`);
+
+  // Čuvamo token u localStorage
+  localStorage.setItem("token", data.token); // ovo ćemo dobiti iz backend-a
+
+  // Preusmeravamo korisnika na productlist ako je seller
+  if (data.user.role === "seller") {
+    navigate("/productlist");
+  } else {
+    navigate("/"); // za customer-a može neka druga ruta
+  }
+} else {
+  setMessage(data.error);
       }
     } catch (err) {
       console.error(err);

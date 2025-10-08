@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function RegisterForm({ role }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // hook za navigaciju
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -17,7 +19,13 @@ function RegisterForm({ role }) {
       });
 
       const data = await res.json();
-      setMessage(data.message || data.error);
+
+      if (res.ok) {
+        setMessage(data.message);        // Prikazuje poruku uspeha
+        navigate("/login");              // Preusmerava na login stranicu
+      } else {
+        setMessage(data.error);          // Prikazuje grešku ako postoji
+      }
     } catch (err) {
       console.error(err);
       setMessage("Greška servera");
