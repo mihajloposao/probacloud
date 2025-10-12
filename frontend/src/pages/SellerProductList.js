@@ -40,7 +40,7 @@ function SellerProductList() {
 
   return (
     <div>
-      <h1>Lista proizvoda</h1>
+      <h1>Vasa lista proizvoda</h1>
       <ul className="product-list">
         {products.map((p) => (
           <li key={p.id} className="product-item">

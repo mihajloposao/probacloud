@@ -55,8 +55,14 @@ function Layout({ children }) {
           {userRole === "seller" && (
             <Link to="/addproduct" className="nav-link">Dodaj proizvod</Link>
           )}
+          {userRole === "seller" && (
+            <Link to="/seller/productlist" className="nav-link">Vasi proizvodi</Link>
+          )}
           {userRole && (
             <button onClick={handleLogout} className="nav-link">Logout</button>
+          )}
+          {!userRole &&(
+            <Link to="/login" className="nav-link">LogIn</Link>
           )}
           {!userRole &&(
             <Link to="/register/customer" className="nav-link">Registracija kupca</Link>

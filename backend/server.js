@@ -282,6 +282,76 @@ app.get('/user/balance', (req, res) => {
   });
 });
 
+// Kupovina proizvoda
+app.post('/buy/:productId', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Niste autorizovani' });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET_KEY);
+  } catch (err) {
+    return res.status(401).json({ error: 'Nevažeći token' });
+  }
+
+  const buyerId = decoded.id;
+  const { productId } = req.params;
+
+  // 1️⃣ Dohvati proizvod
+  const getProductQuery = 'SELECT * FROM products WHERE id = ?';
+  db.query(getProductQuery, [productId], (err, productResults) => {
+    if (err) return res.status(500).json({ error: 'Greška servera (dohvatanje proizvoda)' });
+    if (productResults.length === 0) return res.status(404).json({ error: 'Proizvod nije pronađen' });
+
+    const product = productResults[0];
+    const sellerId = product.user_id;
+    const price = parseFloat(product.price);
+
+    // 2️⃣ Proveri da li kupac ima dovoljno novca
+    const getBuyerQuery = 'SELECT balance FROM users WHERE id = ?';
+    db.query(getBuyerQuery, [buyerId], (err, buyerResults) => {
+      if (err) return res.status(500).json({ error: 'Greška servera (dohvatanje kupca)' });
+      if (buyerResults.length === 0) return res.status(404).json({ error: 'Kupac nije pronađen' });
+
+      const buyerBalance = parseFloat(buyerResults[0].balance);
+
+      if (buyerBalance < price) {
+        return res.status(400).json({ error: 'Nemate dovoljno sredstava za kupovinu' });
+      }
+
+      // 3️⃣ Ažuriraj balance kupca i prodavca i obriši proizvod
+      db.beginTransaction((err) => {
+        if (err) return res.status(500).json({ error: 'Greška u transakciji' });
+
+        const updateBuyer = 'UPDATE users SET balance = balance - ? WHERE id = ?';
+        const updateSeller = 'UPDATE users SET balance = balance + ? WHERE id = ?';
+        const deleteProduct = 'DELETE FROM products WHERE id = ?';
+
+        db.query(updateBuyer, [price, buyerId], (err) => {
+          if (err) return db.rollback(() => res.status(500).json({ error: 'Greška pri ažuriranju kupca' }));
+
+          db.query(updateSeller, [price, sellerId], (err) => {
+            if (err) return db.rollback(() => res.status(500).json({ error: 'Greška pri ažuriranju prodavca' }));
+
+            db.query(deleteProduct, [productId], (err) => {
+              if (err) return db.rollback(() => res.status(500).json({ error: 'Greška pri brisanju proizvoda' }));
+
+              db.commit((err) => {
+                if (err) return db.rollback(() => res.status(500).json({ error: 'Greška pri potvrđivanju transakcije' }));
+
+                res.json({ message: 'Kupovina uspešno obavljena!' });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
 // Start servera
 app.listen(PORT, () => {
   console.log(`Server je pokrenut na http://localhost:${PORT}`);

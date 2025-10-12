@@ -29,7 +29,7 @@ function AddBalance() {
         throw new Error("Greška pri ažuriranju balansa.");
       }
 
-      navigate("/productlist");
+      navigate("/");
       window.location.reload();
     } catch (err) {
       console.error(err);

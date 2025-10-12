@@ -26,14 +26,14 @@ function Login() {
 
   // Preusmeravamo korisnika na productlist ako je seller
   if (data.user.role === "seller") {
-    navigate("/productlist");
+    navigate("/seller/productlist");
     window.location.reload();
   } else {
     navigate("/"); // za customer-a može neka druga ruta
     window.location.reload();
   }
 } else {
-  setMessage(data.error);
+  //setMessage(data.error);
       }
     } catch (err) {
       console.error(err);

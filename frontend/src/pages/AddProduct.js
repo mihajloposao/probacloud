@@ -25,7 +25,7 @@ function AddProduct() {
       method: "POST",
       body: data,
     })
-      .then(() => navigate("/productlist"))
+      .then(() => navigate("/seller/productlist"))
       .catch((err) => console.error(err));
   };
 

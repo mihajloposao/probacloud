@@ -26,7 +26,7 @@ function App() {
           <Route path="/register/customer" element={<RegisterCustomer />} />
           <Route path="/register/seller" element={<RegisterSeller />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/productlist" element={<ProductList/>}/>       
+          <Route path="/" element={<ProtectedRoute allowedRoles={['seller','customer']}><ProductList/></ProtectedRoute>}/>       
         </Routes>
       </Layout>
     </Router>
