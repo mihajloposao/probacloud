@@ -1,18 +1,12 @@
-# Koristimo Node.js image
 FROM node:20
 
-# Postavljamo radni direktorijum
 WORKDIR /app
 
-# Kopiramo package fajlove i instaliramo zavisnosti
 COPY package*.json ./
 RUN npm install
 
-# Kopiramo ceo kod
 COPY . .
 
-# Ekspozujemo port koji React koristi
 EXPOSE 3001
 
-# Pokrećemo razvojni server
 CMD ["npm", "start"]
