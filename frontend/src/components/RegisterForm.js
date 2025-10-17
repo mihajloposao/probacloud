@@ -6,7 +6,7 @@ function RegisterForm({ role }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // hook za navigaciju
+  const navigate = useNavigate(); 
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -21,10 +21,10 @@ function RegisterForm({ role }) {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage(data.message);        // Prikazuje poruku uspeha
-        navigate("/login");              // Preusmerava na login stranicu
+        setMessage(data.message);        
+        navigate("/login");              
       } else {
-        setMessage(data.error);          // Prikazuje grešku ako postoji
+        setMessage(data.error);          
       }
     } catch (err) {
       console.error(err);

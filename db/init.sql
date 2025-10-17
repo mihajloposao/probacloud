@@ -1,4 +1,3 @@
--- Tabela korisnika (admini i kupci)
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
@@ -8,7 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
   role ENUM('seller', 'customer') DEFAULT 'customer'
 );
 
--- Tabela proizvoda
 CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),

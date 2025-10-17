@@ -15,7 +15,7 @@ function ProductList() {
     fetchProducts();
   }, []);
 
-  // ✅ Funkcija za kupovinu
+  // Funkcija za kupovinu
   const handleBuy = async (productId) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -41,7 +41,7 @@ function ProductList() {
 
       alert("Kupovina uspešna!");
       window.location.reload();
-      fetchProducts(); // osveži listu
+      fetchProducts();
     } catch (err) {
       console.error("Greška pri kupovini:", err);
       alert("Greška pri kupovini proizvoda.");

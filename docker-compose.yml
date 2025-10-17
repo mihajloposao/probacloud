@@ -17,6 +17,8 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql 
+    networks:
+      - webshop_network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 8s
@@ -39,6 +41,8 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./backend/uploads:/app/uploads
+    networks:
+      - webshop_network
     depends_on:
       db:
         condition: service_healthy
@@ -54,9 +58,15 @@ services:
       - /app/node_modules
     environment:
       - REACT_APP_API_URL=http://localhost:3000
+    networks:
+      - webshop_network
     depends_on:
       - backend
 
 
 volumes:
   db_data:
+
+networks:
+  webshop_network:
+    driver: bridge

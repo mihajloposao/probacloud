@@ -22,14 +22,14 @@ function Login() {
   setMessage(`Prijavljen: ${data.user.name} (${data.user.role})`);
 
   // Čuvamo token u localStorage
-  localStorage.setItem("token", data.token); // ovo ćemo dobiti iz backend-a
+  localStorage.setItem("token", data.token); 
 
   // Preusmeravamo korisnika na productlist ako je seller
   if (data.user.role === "seller") {
     navigate("/seller/productlist");
     window.location.reload();
   } else {
-    navigate("/"); // za customer-a može neka druga ruta
+    navigate("/"); 
     window.location.reload();
   }
 } else {

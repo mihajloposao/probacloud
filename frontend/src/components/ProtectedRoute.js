@@ -3,24 +3,24 @@ import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const token = localStorage.getItem("token"); // proveravamo da li postoji token
+  const token = localStorage.getItem("token"); 
 
   if (!token) {
-    return <Navigate to="/login" />; // nije prijavljen
+    return <Navigate to="/login" />; 
   }
 
   let user;
   try {
-    user = jwtDecode(token); // dekodujemo token da dobijemo rolu
+    user = jwtDecode(token); 
   } catch {
-    return <Navigate to="/login" />; // token je nevažeći
+    return <Navigate to="/login" />; 
   }
 
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to="/login" />; // nema prava pristupa
+    return <Navigate to="/login" />; 
   }
 
-  return children; // sve OK, ruta je dostupna
+  return children; 
 }
 
 export default ProtectedRoute;

@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -8,7 +7,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { DECIMAL } = require('sequelize');
-const SECRET_KEY = "ovo_je_moj_tajni_kljuc"; // kasnije može iz .env
+const SECRET_KEY = "ovo_je_moj_tajni_kljuc"; 
 require('dotenv').config();
 
 const app = express();
@@ -19,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // za pristup slikama
 
-// Konekcija sa MySQL bazom
+// Konekcija sa sql bazom
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -51,7 +50,7 @@ const upload = multer({ storage: storage });
 
 // Test ruta
 app.get('/', (req, res) => {
-  res.send('Backend radi! 🎉');
+  res.send('Backend radi!');
 });
 
 // Dohvatanje svih proizvoda
@@ -73,7 +72,7 @@ app.get('/seller/products', (req, res) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, SECRET_KEY); // isto kao u login ruti
+    decoded = jwt.verify(token, SECRET_KEY); 
   } catch (err) {
     return res.status(401).json({ error: 'Nevažeći token' });
   }
@@ -84,9 +83,9 @@ app.get('/seller/products', (req, res) => {
   });
 });
 
-// Dodavanje proizvoda sa user_id
+// Dodavanje proizvoda za user_id
 app.post('/products', upload.single('image'), (req, res) => {
-  const { name, description, price, user_id } = req.body; // dodali user_id
+  const { name, description, price, user_id } = req.body;
   const imagePath = req.file ? `uploads/${req.file.filename}` : null;
 
   if (!user_id) {
@@ -216,7 +215,7 @@ const token = jwt.sign(
 
 res.json({
   message: 'Uspešno prijavljen!',
-  token, // dodajemo token
+  token,
   user: {
     id: user.id,
     name: user.name,
@@ -300,7 +299,7 @@ app.post('/buy/:productId', (req, res) => {
   const buyerId = decoded.id;
   const { productId } = req.params;
 
-  // 1️⃣ Dohvati proizvod
+  // Dohvati proizvod
   const getProductQuery = 'SELECT * FROM products WHERE id = ?';
   db.query(getProductQuery, [productId], (err, productResults) => {
     if (err) return res.status(500).json({ error: 'Greška servera (dohvatanje proizvoda)' });
@@ -310,7 +309,7 @@ app.post('/buy/:productId', (req, res) => {
     const sellerId = product.user_id;
     const price = parseFloat(product.price);
 
-    // 2️⃣ Proveri da li kupac ima dovoljno novca
+    // Proveri da li kupac ima dovoljno novca
     const getBuyerQuery = 'SELECT balance FROM users WHERE id = ?';
     db.query(getBuyerQuery, [buyerId], (err, buyerResults) => {
       if (err) return res.status(500).json({ error: 'Greška servera (dohvatanje kupca)' });
@@ -322,7 +321,7 @@ app.post('/buy/:productId', (req, res) => {
         return res.status(400).json({ error: 'Nemate dovoljno sredstava za kupovinu' });
       }
 
-      // 3️⃣ Ažuriraj balance kupca i prodavca i obriši proizvod
+      // Ažuriraj balance kupca i prodavca i obriši proizvod
       db.beginTransaction((err) => {
         if (err) return res.status(500).json({ error: 'Greška u transakciji' });
 
