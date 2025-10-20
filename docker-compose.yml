@@ -7,11 +7,8 @@ services:
     image: mysql:8.0
     container_name: miniweb_db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: mini_webshop
-      MYSQL_USER: webshop
-      MYSQL_PASSWORD: webshoppass
+    env_file:
+      - ./db/.env
     ports:
       - "3306:3306"
     volumes:
@@ -31,18 +28,19 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      DB_HOST: db
-      DB_USER: webshop
-      DB_PASSWORD: webshoppass
-      DB_NAME: mini_webshop
-      DB_PORT: 3306
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
       - ./backend/uploads:/app/uploads
     networks:
       - webshop_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       db:
         condition: service_healthy
@@ -52,12 +50,12 @@ services:
     container_name: miniweb_frontend
     restart: always
     ports:
-      - "3001:3000"
+      - "3001:3001"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - REACT_APP_API_URL=http://localhost:3000
+    env_file:
+      - ./frontend/.env
     networks:
       - webshop_network
     depends_on:
